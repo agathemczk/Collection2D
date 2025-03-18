@@ -6,8 +6,16 @@ import java.util.HashMap;
 
 public class Collection2D <E extends Collection2DElement<E>> extends HashMap<Point, List<E>> {
 
-    public void notifyElementHasMoved(final E collection2DElementTest, final Point oldPosition) {
-        
+    public void notifyElementHasMoved(final E element, final Point oldPosition) {
+        if (element == null) throw new IllegalArgumentException("Element cannot be null");
+        if (element.getCollection() != this) throw new IllegalArgumentException("Element is not in this collection");
+        if (oldPosition == null ) throw new ArrayIndexOutOfBoundsException("Old position cannot be null.");
+        final List<E> oldList = this.get(oldPosition);
+        if (oldList == null || !oldList.contains(element)) throw new IllegalArgumentException("Element not found at old position " + oldPosition);
+        oldList.remove(element);
+        if (oldList.isEmpty()) this.remove(oldPosition);
+        element.setCollection(null);
+        this.add(element);
     }
 
     public void add(final E element) {
@@ -45,10 +53,20 @@ public class Collection2D <E extends Collection2DElement<E>> extends HashMap<Poi
     }
 
     public List<E> toList() {
-        return null;
+        final List<E> list = new ArrayList<>();
+        for (final List<E> elements : this.values()) {
+            list.addAll(elements);
+        }
+        return list;
     }
 
     public Dimension getDimension() {
-        return null;
+        int width = 0;
+        int height = 0;
+        for (Point point : this.keySet()) {
+            if (width < point.x ) width = point.x;
+            if (height < point.y) height = point.y;
+        }
+        return new Dimension(width+1, height+1);
     }
 }

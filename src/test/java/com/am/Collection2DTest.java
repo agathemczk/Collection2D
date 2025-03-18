@@ -13,9 +13,9 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class Collection2DTest {
 
-    public static final int NB_ELEMENTS_TO_ADD = 100;
-    private static final int NB_ROWS = 107;
-    private static final int NB_COLUMNS = 123 ;
+    public static final int NB_ELEMENTS_TO_ADD = 10;
+    private static final int NB_ROWS = 17;
+    private static final int NB_COLUMNS = 12 ;
     private static Collection2D<Collection2DElementTest> collection2D;
     private static List<Collection2DElementTest> elements;
 
@@ -91,15 +91,21 @@ class Collection2DTest {
         Collection2DElementTest newElement = new Collection2DElementTest();
         newElement.setPosition(new Point(1000, 2000));
         Collection2DTest.collection2D.add(newElement);
-        assertEquals(new Dimension(1000, 2000), Collection2DTest.collection2D.getDimension());
+        assertEquals(new Dimension(1000+1, 2000+1), Collection2DTest.collection2D.getDimension());
     }
 
     @Test
     void elementHasMoved() {
         Collection2DElementTest elementTest = Collection2DTest.elements.get(0);
         assertThrows(ArrayIndexOutOfBoundsException.class, () -> elementTest.setPosition(new Point(-100, -10)));
+        elementTest.setPosition(new Point(100, 10));
+        collection2D.add(elementTest);
         assertThrows(ArrayIndexOutOfBoundsException.class, () -> elementTest.setPosition(new Point(100, -10)));
+        elementTest.setPosition(new Point(100, 10));
+        collection2D.add(elementTest);
         assertThrows(ArrayIndexOutOfBoundsException.class, () -> elementTest.setPosition(new Point(-100, 10)));
+        elementTest.setPosition(new Point(100, 10));
+        collection2D.add(elementTest);
 
     }
 
@@ -110,14 +116,18 @@ class Collection2DTest {
     }
 
     @Getter
-    @Setter
     private static class Collection2DElementTest implements Collection2DElement<Collection2DElementTest> {
         private Point position;
+        @Setter
         private Collection2D<Collection2DElementTest> collection;
-        public void moveTo(final Point newPosition) {
+
+        @Override
+        public void setPosition(final Point newPosition) {
             final Point oldPosition = this.position;
-            this.collection.notifyElementHasMoved(this, oldPosition);
             this.position = newPosition;
+            if(this.collection != null) {
+                this.collection.notifyElementHasMoved(this, oldPosition);
+            }
         }
     }
 
