@@ -39,27 +39,34 @@ class Collection2DTest {
     void addAndGet() {
         for (Collection2DElementTest elementTest : Collection2DTest.elements) {
             List<Collection2DElementTest> actualElementsAtPosition = Collection2DTest.collection2D.get(elementTest.position);
-            assertNotNull(actualElementsAtPosition);
-            assertEquals(1, actualElementsAtPosition.size());
-            assertEquals(elementTest, actualElementsAtPosition.get(0));
+            assertNotNull(actualElementsAtPosition, "Element's list at position " + elementTest.position + " is null");
+            assertEquals(Collection2DTest.NB_ELEMENTS_TO_ADD, actualElementsAtPosition.size(), "Expected one element at position " + elementTest.position);
+            assertTrue(actualElementsAtPosition.contains(elementTest), "Expected element at position " + elementTest.position + " to be " + elementTest);
         }
+
         Collection2DElementTest newElement = new Collection2DElementTest();
         newElement.setPosition(new Point(-100, -10));
-        assertThrows(ArrayIndexOutOfBoundsException.class, () -> Collection2DTest.collection2D.add(newElement));
+        assertThrows(ArrayIndexOutOfBoundsException.class, () -> Collection2DTest.collection2D.add(newElement), "Expected ArrayIndexOutOfBoundsException to be thrown");
         newElement.setPosition(new Point(100, -10));
-        assertThrows(ArrayIndexOutOfBoundsException.class, () -> Collection2DTest.collection2D.add(newElement));
+        assertThrows(ArrayIndexOutOfBoundsException.class, () -> Collection2DTest.collection2D.add(newElement), "Expected ArrayIndexOutOfBoundsException to be thrown");
         newElement.setPosition(new Point(-100, 10));
-        assertThrows(ArrayIndexOutOfBoundsException.class, () -> Collection2DTest.collection2D.add(newElement));
+        assertThrows(ArrayIndexOutOfBoundsException.class, () -> Collection2DTest.collection2D.add(newElement), "Expected ArrayIndexOutOfBoundsException to be thrown");
+        assertThrows(IllegalArgumentException.class, () -> Collection2DTest.collection2D.add(null), "Expected IllegalArgumentException to be thrown when adding null element");
+        newElement.setPosition(new Point(0, 0));
+        newElement.setCollection(new Collection2D<>());
+        assertThrows(IllegalArgumentException.class, () -> Collection2DTest.collection2D.add(newElement), "Expected IllegalArgumentException to be thrown when adding element with null collection");
     }
 
     @Test
     void remove() {
         for (Collection2DElementTest elementTest : Collection2DTest.elements) {
-            Collection2DTest.collection2D.remove(elementTest);
             List<Collection2DElementTest> actualElementsAtPosition = Collection2DTest.collection2D.get(elementTest.position);
-            assertNotNull(actualElementsAtPosition);
-            assertFalse(actualElementsAtPosition.contains(elementTest));
+            final int expectedSize = actualElementsAtPosition.size() - 1;
+            Collection2DTest.collection2D.remove(elementTest);
+            assertEquals(expectedSize, actualElementsAtPosition.size(), "Expected one element at position " + elementTest.position + " to be removed");
+            assertFalse(actualElementsAtPosition.contains(elementTest), "Expected element at position " + elementTest.position + " to be removed");
         }
+        assertThrows(IllegalArgumentException.class, () -> Collection2DTest.collection2D.remove(null));
     }
 
     @Test
@@ -67,6 +74,7 @@ class Collection2DTest {
         for (Collection2DElementTest elementTest : Collection2DTest.elements) {
             assertTrue(Collection2DTest.collection2D.contains(elementTest));
         }
+        assertThrows(IllegalArgumentException.class, () -> Collection2DTest.collection2D.contains(null));
     }
 
     @Test
