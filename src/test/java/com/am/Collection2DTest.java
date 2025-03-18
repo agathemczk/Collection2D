@@ -95,6 +95,12 @@ class Collection2DTest {
 
     }
 
+    @Test
+    void isEmpty() {
+        assertFalse(Collection2DTest.collection2D.isEmpty());
+        assertTrue(new Collection2D<Collection2DElementTest>().isEmpty());
+    }
+
     @Getter
     @Setter
     private static class Collection2DElementTest implements Collection2DElement<Collection2DElementTest> {
